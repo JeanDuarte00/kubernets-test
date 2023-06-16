@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  replicas: 4
+  serviceName: mysql-db-headless
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql
+        volumeMounts:
+          - mountPath: /var/lib/mysql
+            name: mysql-volume
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: root
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-volume
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi

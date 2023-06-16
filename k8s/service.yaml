@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathserver-service
+spec:
+  selector:
+    app: mathserver
+  type: ClusterIP
+  ports:
+  - name: mathserver-service
+    port: 9000
+    targetPort: 8090
+    protocol: TCP

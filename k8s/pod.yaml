@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mathserver
+  labels:
+    name: mathserver
+spec:
+  containers:
+  - name: mathserver
+    image: jeanduarte00/mathserver-image:latest

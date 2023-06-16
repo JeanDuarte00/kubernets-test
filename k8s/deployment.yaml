@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mathserver
+  labels:
+    app: mathserver
+spec:
+  serviceName: mathserver-app-headless
+  selector:
+    matchLabels:
+      app: mathserver    
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: "mathserver"
+    spec:
+      containers:
+        - name: math-service-application  
+          image: "jeanduarte00/mathserver-image:v9"
+# TODO: recriar image do server e deploy novamnete, 
+# talvez nao tenha ido com a versao certa
+          resources:
+            requests: 
+              cpu: "0.05"
+              memory: 20Mi
+            limits:
+              cpu: "0.05" 
+              memory: 25Mi
+          
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8090
+            periodSeconds: 4
+            failureThreshold: 30
+            initialDelaySeconds: 5
+
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8090
+            periodSeconds: 10
+            failureThreshold: 1
+            initialDelaySeconds: 10
+
+          # livenessProbe:
+          #   httpGet:
+          #     path: /healthz
+          #     port: 8090
+          #   periodSeconds: 5
+          #   failureThreshold: 1
+          #   timeoutSeconds: 1
+          #   successThreshold: 1
+          #   # initialDelaySeconds: 15
+
+          envFrom:
+            - configMapRef:
+                name: mathserver-env
+            - secretRef:
+                name: mathserver-secret
+                
+          volumeMounts:
+            - mountPath: "/go/family"
+              name: config
+              readOnly: true
+            - mountPath: "/go/pvc"
+              name: mathserver-volume-pvc
+
+      volumes:
+        - name: mathserver-volume-pvc
+          persistentVolumeClaim:
+            claimName: mathserver-pvc
+          
+        - name: config
+          configMap:
+            name: configmap-family
+            items:
+              - key: members
+                path: "members.txt"

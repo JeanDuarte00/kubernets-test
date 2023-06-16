@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mathserver
+  labels:
+    app: mathserver
+spec:
+  selector:
+    matchLabels:
+      app: mathserver    
+  replicas: 10
+  template:
+    metadata:
+      labels:
+        app: "mathserver"
+    spec:
+      containers:
+        - name: goserver
+          image: "jeanduarte00/mathserver-image:latest"

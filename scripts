@@ -1,0 +1,21 @@
+kind create cluster --name=test-cluster --config=./k8s/kind.yaml
+
+kubectl cluster-info --context kind-test-cluster
+
+sudo docker build -t jeanduarte00/mathserver-image:latest .
+
+sudo docker run --rm -p 80:8090 jeanduarte00/mathserver-image:latest 
+
+docker push jeanduarte00/mathserver-image:latest
+
+sudo kubectl apply -f k8s/pod.yaml
+
+sudo kubectl port-forward svc/mathserver-service 80:9000
+
+sudo kubectl proxy 
+kubectl -n kubernetes-dashboard create token admin-user   
+http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/login
+
+kubectl run -it fortio --rm --image=fortio/fortio -- load -qps 1000 -t 120s -c 100 "http://mathserver-service:9000/healthz"
+
+watch -n1 kubectl get hpa

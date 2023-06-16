@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mathserver-env
+data:
+  NAME: "JEAN"
+  AGE: "27"
